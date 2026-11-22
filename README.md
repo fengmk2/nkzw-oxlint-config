@@ -4,6 +4,8 @@ _Opinionated Oxlint config with sensible defaults._
 
 ## Installation & Usage
 
+### Standalone Oxlint
+
 Install the preset with Oxlint 1.94+ and its type-aware backend, `tsrs`:
 
 ```
@@ -18,16 +20,51 @@ import { defineConfig } from 'oxlint';
 
 export default defineConfig({
   extends: [nkzw],
+  env: nkzw.env,
 });
 ```
 
-To include sorting, change the import to `@nkzw/oxlint-config/with-sorting`. Then run `pnpm oxlint` or `npx oxlint`.
+Oxlint 1.94 reads `env` from the root config. Setting `env: nkzw.env` keeps the preset's browser and Node.js globals when using `extends`.
+
+To include sorting, install `eslint-plugin-perfectionist` as a dev dependency and change the import to `@nkzw/oxlint-config/with-sorting`.
+
+```sh
+npm install -D eslint-plugin-perfectionist@^5.14.0
+```
+
+If you already use `/with-sorting`, add this dependency when upgrading.
+
+Run `pnpm oxlint` or `npx oxlint` to lint with either preset.
 
 In 3.0, both presets run type-aware rules and report unused lint suppressions as errors by default. If you already use Oxlint 1.94+ and only need the backend, run `npm install -D tsrs` or `pnpm add -D tsrs`.
 
+### Vite+
+
+Use a Vite+ release that includes Oxlint 1.94+ and `tsrs`, such as `vite-plus@1.7.0`. Add the preset to your project.
+
+```sh
+vp add -D @nkzw/oxlint-config
+```
+
+Import the Vite+ entry in your root `vite.config.ts` so TypeScript uses the lint types from your installed version of Vite+.
+
+```ts
+import nkzw from '@nkzw/oxlint-config/vite-plus';
+import { defineConfig } from 'vite-plus';
+
+export default defineConfig({
+  lint: {
+    extends: [nkzw],
+    env: nkzw.env,
+  },
+});
+```
+
+Run `vp lint`. To enable sorting, run `vp add -D eslint-plugin-perfectionist@^5.14.0` and import `@nkzw/oxlint-config/vite-plus/with-sorting`. See the [Vite+ lint guide](https://viteplus.dev/config/lint).
+
 ## Migrating to v3
 
-1. Upgrade `@nkzw/oxlint-config` to v3, install Oxlint 1.94+ and `tsrs`, and switch your import to `@nkzw/oxlint-config/with-sorting` to keep v2’s sorting rules.
+1. Upgrade `@nkzw/oxlint-config` to v3 and install Oxlint 1.94+ and `tsrs`. To keep v2’s sorting rules, also install `eslint-plugin-perfectionist` and switch your import to `@nkzw/oxlint-config/with-sorting`.
 2. Run `pnpm oxlint`. In your project config, temporarily set each new rule that reports errors to `"off"`. Rerun lint and commit the passing upgrade.
 3. Remove one `"off"` override and run lint. If the rule fits your project, fix every finding, rerun lint, and commit the change for that rule.
 4. Repeat for each remaining override. Confirm with the project maintainers which rules, if any, should stay disabled.
